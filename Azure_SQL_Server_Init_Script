@@ -1,0 +1,43 @@
+/* Create the database */
+CREATE DATABASE repository_database_name;
+
+
+/* Configure the database */
+ALTER DATABASE repository_database_name SET READ_COMMITTED_SNAPSHOT ON;
+ALTER DATABASE repository_database_name SET QUOTED_IDENTIFIER ON;
+
+
+/* Create a login to connect to the database */
+CREATE LOGIN repository_user WITH PASSWORD='Password12345';
+CREATE USER repository_user FOR LOGIN repository_user;
+
+
+/* Remember that in Azure SQL Database, switching databases within the same 
+ * connection is not possible, so you'll need to establish a new connection 
+ * to the <repository_database_name> database to execute subsequent statements. */
+USE repository_database_name;
+
+
+/* Add a user for that login in the database */
+CREATE USER repository_user FOR LOGIN repository_user;
+
+
+/* Make this user a database owner */
+EXEC sp_addrolemember 'db_owner', 'repository_user';
+
+----------------------------------------------------------------------------------------------------------
+
+/* Create the repository read-only user */
+CREATE LOGIN repository_readonly_user WITH PASSWORD='Password12345'
+CREATE USER repository_readonly_user FOR LOGIN repository_readonly_user;
+
+
+/* Remember that in Azure SQL Database, switching databases within the same 
+ * connection is not possible, so you'll need to establish a new connection 
+ * to the <repository_database_name> database to execute subsequent statements. */
+USE repository_database_name;
+
+CREATE USER repository_readonly_user FOR LOGIN repository_readonly_user;
+
+/* Grant minimum access to the user */
+GRANT CONNECT TO repository_readonly_user;
